@@ -16,9 +16,9 @@
 <li>Скомпилировать и запустить приложение указав -path={путь до файлов конфигурации}</li>
 <h2>Через docker-compose</h2>
 <li>В файле конфигурации docker-compose, используются следующие переменные окружения. Можно задать их через .env файл</li>
-    <ul>POSTGRES_USER
-    <ul>POSTGRES_PASSWORD
-    <ul>POSTGRES_DB
+    <ul>POSTGRES_USER</ul>
+    <ul>POSTGRES_PASSWORD</ul>
+    <ul>POSTGRES_DB</ul>
 <li>Составать конфиг в формате json, в следующем виде</li>
 <code>{
   "address": ":8080", 
