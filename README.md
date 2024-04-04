@@ -44,7 +44,7 @@
 <li>Локально, писал на linux/ubuntu, в контейнере запускается на alpine</li>
 <p>Помимо стандратной библиотеки были использованы</p>
 <li>github.com/jmoiron/sqlx - для работы с базами данных</li>
-<li>github.com/jackc/pgx - в качестве драйврея для postgres</li>
+<li>github.com/jackc/pgx - в качестве драйвера для postgres</li>
 <li>github.com/pressly/goose - для работы с миграциями</li>
 
 
