@@ -1,6 +1,6 @@
 services:
   app:
-    build: TestTask-PGPro
+    build: ./
     command: ./launch-service
     depends_on:
       - db

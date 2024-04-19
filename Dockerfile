@@ -7,7 +7,7 @@ RUN apk --no-cache add bash git make gettext
 COPY go.* ./
 RUN go mod download
 
-COPY TestTask-PGPro ./
+COPY ./ ./
 
 RUN go build -o ./bin/launch-service cmd/main.go
 

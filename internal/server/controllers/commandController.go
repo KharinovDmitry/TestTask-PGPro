@@ -5,11 +5,9 @@ import (
 	"TestTask-PGPro/internal/server/dto"
 	"TestTask-PGPro/lib/byteconv"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type CommandController struct {
@@ -25,42 +23,7 @@ func NewCommandController(logger slog.Logger, commandRepository domain.ICommands
 	}
 }
 
-func (c *CommandController) CommandHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/command" {
-		if r.Method == http.MethodPost {
-			c.createCommandHandler(w, r)
-		} else if r.Method == http.MethodGet {
-			c.getAllCommandsHandler(w, r)
-		} else {
-			http.Error(w, fmt.Sprintf("expect method GET or POST, got %v", r.Method), http.StatusMethodNotAllowed)
-			return
-		}
-	} else {
-		path := strings.Trim(r.URL.Path, "/")
-		pathParts := strings.Split(path, "/")
-		if len(pathParts) < 2 {
-			http.Error(w, "expect /command/<id>", http.StatusBadRequest)
-			return
-		}
-
-		id, err := strconv.Atoi(pathParts[1])
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		if r.Method == http.MethodDelete {
-			c.deleteCommandHandler(w, r, id)
-		} else if r.Method == http.MethodGet {
-			c.getCommandHandler(w, r, id)
-		} else {
-			http.Error(w, fmt.Sprintf("expect method GET or DELETE at /command/<id>, got %v", r.Method), http.StatusMethodNotAllowed)
-			return
-		}
-	}
-}
-
-func (c *CommandController) createCommandHandler(w http.ResponseWriter, r *http.Request) {
+func (c *CommandController) CreateCommandHandler(w http.ResponseWriter, r *http.Request) {
 	var req dto.AddCommandRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -80,7 +43,7 @@ func (c *CommandController) createCommandHandler(w http.ResponseWriter, r *http.
 	w.Write(byteconv.Bytes(strconv.Itoa(id)))
 }
 
-func (c *CommandController) getAllCommandsHandler(w http.ResponseWriter, r *http.Request) {
+func (c *CommandController) GetAllCommandsHandler(w http.ResponseWriter, r *http.Request) {
 	commands, err := c.commandRepository.GetCommands(r.Context())
 	if err != nil {
 		c.logger.Error(err.Error())
@@ -100,7 +63,13 @@ func (c *CommandController) getAllCommandsHandler(w http.ResponseWriter, r *http
 	w.Write(response)
 }
 
-func (c *CommandController) getCommandHandler(w http.ResponseWriter, r *http.Request, id int) {
+func (c *CommandController) GetCommandHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	command, err := c.commandRepository.GetCommand(r.Context(), id)
 	if err != nil {
 		c.logger.Error(err.Error())
@@ -120,8 +89,14 @@ func (c *CommandController) getCommandHandler(w http.ResponseWriter, r *http.Req
 	w.Write(response)
 }
 
-func (c *CommandController) deleteCommandHandler(w http.ResponseWriter, r *http.Request, id int) {
-	err := c.commandRepository.DeleteCommand(r.Context(), id)
+func (c *CommandController) DeleteCommandHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = c.commandRepository.DeleteCommand(r.Context(), id)
 	if err != nil {
 		c.logger.Error(err.Error())
 		apiErr := dto.NewApiError(err)
