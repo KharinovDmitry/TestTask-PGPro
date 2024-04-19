@@ -9,7 +9,7 @@ type Launch struct {
 }
 
 func LaunchesToLaunchesDTO(launches []domain.Launch) []Launch {
-	res := make([]Launch, len(launches))
+	res := make([]Launch, 0, len(launches))
 	for i, _ := range res {
 		res[i] = Launch((launches[i]))
 	}

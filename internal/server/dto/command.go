@@ -8,7 +8,7 @@ type Command struct {
 }
 
 func CommandsToCommandsDTO(commands []domain.Command) []Command {
-	res := make([]Command, len(commands))
+	res := make([]Command, 0, len(commands))
 	for i, _ := range res {
 		res[i] = Command((commands[i]))
 	}

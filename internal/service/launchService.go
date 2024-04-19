@@ -1,7 +1,7 @@
 package service
 
 import (
-	domain "TestTask-PGPro/internal/domain/repository"
+	"TestTask-PGPro/internal/domain/repository"
 	"TestTask-PGPro/lib/adapter/executor"
 	"TestTask-PGPro/lib/byteconv"
 	"context"
@@ -39,32 +39,33 @@ func (l *LaunchService) Launch(ctx context.Context, commandId int) (int, error) 
 		return 0, err
 	}
 
-	go func() {
-		output := make(chan []byte)
-
-		go func() {
-			runCtx, stop := context.WithCancel(context.Background())
-			l.runs.Store(launchId, stop)
-
-			if err := l.executor.Run(runCtx, command.Text, output); err != nil {
-				l.logger.Error(err.Error())
-			}
-		}()
-
-		for {
-			res, ok := <-output
-			if ok {
-				err = l.launchesRepository.AddOutputToLaunch(ctx, launchId, byteconv.String(res))
-				if err != nil {
-					l.logger.Error(err.Error())
-				}
-			} else {
-				break
-			}
-		}
-	}()
+	output := make(chan []byte)
+	runCtx, stop := context.WithCancel(context.Background())
+	l.runs.Store(launchId, stop)
+	go l.execute(runCtx, output, command.Text)
+	go l.writeOutput(ctx, output, launchId)
 
 	return launchId, nil
+}
+
+func (l *LaunchService) execute(ctx context.Context, output chan []byte, command string) {
+	if err := l.executor.Run(ctx, command, output); err != nil {
+		l.logger.Error(err.Error())
+	}
+}
+
+func (l *LaunchService) writeOutput(ctx context.Context, output chan []byte, launchId int) {
+	for {
+		res, ok := <-output
+		if ok {
+			err := l.launchesRepository.AddOutputToLaunch(ctx, launchId, byteconv.String(res))
+			if err != nil {
+				l.logger.Error(err.Error())
+			}
+		} else {
+			break
+		}
+	}
 }
 
 func (l *LaunchService) Stop(ctx context.Context, commandId int) error {

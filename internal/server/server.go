@@ -12,8 +12,8 @@ func MustRun(logger slog.Logger, launchService domain.ILaunchService, storage st
 	commandController := controllers.NewCommandController(logger, storage.CommandsRepository)
 	launchController := controllers.NewLaunchController(logger, storage.LaunchesRepository)
 
-	RunController := controllers.NewRunController(logger, launchService)
-	StopController := controllers.NewStopController(logger, launchService)
+	runController := controllers.NewRunController(logger, launchService)
+	stopController := controllers.NewStopController(logger, launchService)
 
 	mux := http.NewServeMux()
 
@@ -25,8 +25,8 @@ func MustRun(logger slog.Logger, launchService domain.ILaunchService, storage st
 	mux.HandleFunc("GET /launches", launchController.GetAllLaunches)
 	mux.HandleFunc("GET /launch/{id}", launchController.GetLaunch)
 
-	mux.HandleFunc("POST /run/{id}", RunController.Run)
-	mux.HandleFunc("POST /stop/{id}", StopController.Stop)
+	mux.HandleFunc("POST /run/{id}", runController.Run)
+	mux.HandleFunc("POST /stop/{id}", stopController.Stop)
 
 	if err := http.ListenAndServe(address, mux); err != nil {
 		panic(err.Error())
