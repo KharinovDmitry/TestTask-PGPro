@@ -19,7 +19,7 @@
     <ul>POSTGRES_USER</ul>
     <ul>POSTGRES_PASSWORD</ul>
     <ul>POSTGRES_DB</ul>
-<li>Составать конфиг в формате json, в следующем виде</li>
+<li>Составать конфиг в формате json, в следующем виде, сохранить его с названием dev_config.json и положить в internal/config</li>
 <code>{
   "address": ":8080", 
   "timeoutDB": 10, //Сколько программа будет ждать ответа от базы данных
